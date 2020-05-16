@@ -1,4 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
+import _ from 'lodash';
+import { OptMethods, PyremyService } from 'src/optimisation';
 
 /**
  * Class MainController
@@ -6,20 +9,49 @@ import { Controller, Get } from '@nestjs/common';
  */
 @Controller()
 export class MainController {
-    public constructor() {
+    public constructor(
+        @Inject(PyremyService) private readonly pyremyService: PyremyService,
+    ) {
     }
 
-    @Get('liveness')
-    public async livenessCheck(): Promise<object> {
+    @Get()
+    public async home(): Promise<object> {
         return {
             isAlive: true,
         };
     }
 
-    @Get('readiness')
-    public async readinessCheck(): Promise<object> {
+    @Get('status')
+    public async status(): Promise<object> {
+        const pyremyConnection = await this.pyremyService.checkConnection();
+
         return {
+            pyremyConnection: pyremyConnection,
             isAlive: true,
         };
+    }
+
+    @Get('optimise')
+    public async optimise(@Query() query: any, @Res() res: Response): Promise<object> {
+        const currencies = _.get(query, 'currencies', '').split(',');
+        if (!currencies || currencies.length < 2) {
+            res.status(400).send({
+                error: 'Need set currencies',
+            });
+
+            return;
+        }
+
+        try {
+            const data = await this.pyremyService.portfolio(currencies, 5, OptMethods.Markowitz);
+
+            res.status(200).send({
+                data: data,
+            });
+        } catch (error) {
+            res.status(400).send({
+                error: error.message,
+            });
+        }
     }
 }

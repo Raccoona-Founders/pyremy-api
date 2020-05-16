@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { RedisModule } from 'nestjs-redis';
-import { AuthService } from './services';
-import { IdentityModule } from './identity/identity.module';
-import { AuthController, InternalController, MainController } from './controllers';
+import { OptimisationModule } from './optimisation';
+import { MainController } from './controllers';
 import Config from './config';
 
 @Module({
@@ -17,13 +16,12 @@ import Config from './config';
         RedisModule.forRootAsync({
             useFactory: () => ({
                 url: Config.RedisURL,
-                password: Config.RedisPassword,
             }),
         }),
-        IdentityModule,
+        OptimisationModule,
     ],
-    controllers: [MainController, AuthController, InternalController],
-    providers: [AuthService],
+    controllers: [MainController],
+    providers: [OptimisationModule],
 })
 export class AppModule {
 }

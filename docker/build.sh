@@ -35,9 +35,9 @@ build_docker()
     docker build \
         --file ./Dockerfile \
         --build-arg SSH_KEY="$SSH_KEY" \
-        --tag raccoona/pyremy-api:$APPLICATION_VERSION \
-        --tag raccoona/pyremy-api:latest \
-        --tag raccoona/pyremy-api .
+        --tag coinwizard/pyremy-api:$APPLICATION_VERSION \
+        --tag coinwizard/pyremy-api:latest \
+        --tag coinwizard/pyremy-api .
 
     # end of build_docker
 }
@@ -47,8 +47,8 @@ push_docker()
 {
     docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
-    docker push raccoona/pyremy-api:$APPLICATION_VERSION
-    docker push raccoona/pyremy-api:latest
+    docker push coinwizard/pyremy-api:$APPLICATION_VERSION
+    docker push coinwizard/pyremy-api:latest
     # end of push_docker
 }
 

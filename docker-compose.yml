@@ -1,42 +1,73 @@
-version: '3'
+version: "3.3"
 
 services:
 
-  hydra-migrate:
-    image: oryd/hydra:v1.4.5
-    environment:
-      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
-    command:
-      migrate sql -e --yes
+  postgresql:
+    image: 'postgres:9.6'
+    ports:
+      - '5432:5432'
+    env_file:
+      - .db-variables.env
     restart: on-failure
-
-  hydra:
-    image: oryd/hydra:v1.4.5
-    ports:
-      - "4444:4444" # Public port
-      - "4445:4445" # Admin port
-      - "5555:5555" # Port for hydra token user
-    command:
-      serve all --dangerous-force-http
-    environment:
-      - URLS_SELF_ISSUER=http://127.0.0.1:4444
-      - URLS_CONSENT=http://127.0.0.1:3000/consent
-      - URLS_LOGIN=http://127.0.0.1:3000/login
-      - URLS_LOGOUT=http://127.0.0.1:3000/logout
-      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
-      - SECRETS_SYSTEM=youReallyNeedToChangeThis
-      - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
-      - OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
-    restart: unless-stopped
-
-
-  mysqld:
-    image: mysql:5.7
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=secret
-
     volumes:
-      - ./mysql-data:/var/lib/mysql
+      - ./postgresql:/var/lib/postgresql/data
 
+  mongodb:
+    image: 'mongo:3.6.18-xenial'
+    ports:
+      - '27017:27017'
+    env_file:
+      - .db-variables.env
+    restart: on-failure
+    volumes:
+      - ./mongodb:/data/db
+
+
+  influxdb:
+    image: 'influxdb:1.4-alpine'
+    ports:
+      - '8086:8086'
+    env_file:
+      - .db-variables.env
+    restart: on-failure
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+
+
+  redis:
+    image: 'redis:6.0.2-alpine'
+    ports:
+      - '6379:6379'
+    command: ["redis-server", "--bind", "redis", "--port", "6379", "--requirepass", "A892sei3"]
+
+
+
+  # jeremy:
+  #   image: 'coinwizard/jeremy:latest-master'
+  #   command: /bin/bash /app/bin/control.sh start
+  #   env_file:
+  #     - .db-variables.env
+  #   environment:
+  #     - JEREMY_DB_HOST=postgresql
+  #     - JEREMY_DB_NAME=raccoona
+  #     - JEREMY_DB_USERNAME=raccoona
+  #     - JEREMY_DB_PASSWORD=raccoona
+  #     - JEREMY_DB_PORT=5432
+
+  #     - JEREMY_INFLUX_HOST=influxdb
+  #     - JEREMY_INFLUX_USERNAME=raccoona
+  #     - JEREMY_INFLUX_DATABASE=raccoona
+  #     - JEREMY_INFLUX_PASSWORD=A892sei3
+  #     - JEREMY_INFLUX_PORT=8086
+  #     - OPENEXCHANGERATES_APP_ID=6314d556845c4040a5ee60c45a0ab0ad
+  #   ports:
+  #     - '8080:8080'
+  #   restart: on-failure
+
+
+  # pyremy:
+  #   image: 'coinwizard/pyremy:latest-master'
+  #   environment:
+  #     - CW_JEREMY_HOST=jeremy
+  #     - CW_JEREMY_PORT=8080
+  #   restart: on-failure

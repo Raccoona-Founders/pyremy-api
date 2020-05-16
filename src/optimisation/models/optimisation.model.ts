@@ -7,21 +7,13 @@ import { uuid } from 'uuidv4';
         autoIndex: true,
     },
 })
-export class UserModel {
+export class OptimisationModel {
     @IsString()
     public readonly _id: number;
 
     @IsString()
     @prop({ required: true, default: () => uuid() })
     public readonly uuid: string;
-
-    @IsString()
-    @prop({ required: true, unique: true })
-    public readonly email: string;
-
-    @IsString()
-    @prop({ required: true })
-    public password: string;
 
     @IsObject()
     @prop({ default: () => ({}) })
@@ -34,7 +26,9 @@ export class UserModel {
     // @TODO Temporary response system
     public toResponse(): object {
         return {
-            email: this.email,
+            uuid: this.uuid,
+            metadata: this.metadata,
+            createdTime: this.createdTime,
         };
     }
 
