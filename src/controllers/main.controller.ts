@@ -42,11 +42,24 @@ export class MainController {
             return;
         }
 
+        let risk = +_.get(query, 'risk', 5);
+        if (!Number.isInteger(risk) || risk > 10 || risk < 0) {
+            risk = 5;
+        }
+
+        let method = _.get(query, 'method', OptMethods.Markowitz);
+        if (![OptMethods.Markowitz, OptMethods.Weighted].includes(method)) {
+            method = OptMethods.Markowitz;
+        }
+
         try {
-            const data = await this.pyremyService.portfolio(currencies, 5, OptMethods.Markowitz);
+            const data = await this.pyremyService.portfolio(currencies, risk, method);
 
             res.status(200).send({
-                data: data,
+                values: data.currentWeights,
+                lasts: data.getReturnsBy(4, 0.02),
+                params: { currencies, risk, method },
+                // return: data.getDateList(),
             });
         } catch (error) {
             res.status(400).send({

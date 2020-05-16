@@ -2,43 +2,43 @@ version: "3.3"
 
 services:
 
-  postgresql:
-    image: 'postgres:9.6'
-    ports:
-      - '5432:5432'
-    env_file:
-      - .db-variables.env
-    restart: on-failure
-    volumes:
-      - ./postgresql:/var/lib/postgresql/data
-
-  mongodb:
-    image: 'mongo:3.6.18-xenial'
-    ports:
-      - '27017:27017'
-    env_file:
-      - .db-variables.env
-    restart: on-failure
-    volumes:
-      - ./mongodb:/data/db
-
-
-  influxdb:
-    image: 'influxdb:1.4-alpine'
-    ports:
-      - '8086:8086'
-    env_file:
-      - .db-variables.env
-    restart: on-failure
-    volumes:
-      - ./influxdb:/var/lib/influxdb
+#  postgresql:
+#    image: 'postgres:9.6'
+#    ports:
+#      - '5432:5432'
+#    env_file:
+#      - .db-variables.env
+#    restart: on-failure
+#    volumes:
+#      - ./postgresql:/var/lib/postgresql/data
+#
+#  mongodb:
+#    image: 'mongo:3.6.18-xenial'
+#    ports:
+#      - '27017:27017'
+#    env_file:
+#      - .db-variables.env
+#    restart: on-failure
+#    volumes:
+#      - ./mongodb:/data/db
+#
+#
+#  influxdb:
+#    image: 'influxdb:1.4-alpine'
+#    ports:
+#      - '8086:8086'
+#    env_file:
+#      - .db-variables.env
+#    restart: on-failure
+#    volumes:
+#      - ./influxdb:/var/lib/influxdb
 
 
   redis:
     image: 'redis:6.0.2-alpine'
     ports:
       - '6379:6379'
-    command: ["redis-server", "--bind", "redis", "--port", "6379", "--requirepass", "A892sei3"]
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
 
 
 

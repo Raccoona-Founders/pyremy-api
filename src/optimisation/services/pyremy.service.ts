@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Axios, { AxiosInstance } from 'axios';
 import Config from 'src/config';
 import { OptMethods } from 'src/optimisation/opt-methods.enum';
+import { PortfolioDto } from 'src/dto/portfolio.dto';
 
 
 @Injectable()
@@ -31,7 +32,11 @@ export class PyremyService {
     }
 
 
-    public async portfolio(currencies: string[], risk: number = 5, method: OptMethods = OptMethods.Markowitz): Promise<any> {
+    public async portfolio(
+        currencies: string[],
+        risk: number = 5,
+        method: OptMethods = OptMethods.Markowitz,
+    ): Promise<PortfolioDto> {
         const requestData = {
             currencies: _.map(currencies, (c: string) => {
                 return {
@@ -47,6 +52,6 @@ export class PyremyService {
             },
         });
 
-        return data;
+        return new PortfolioDto(data);
     }
 }
