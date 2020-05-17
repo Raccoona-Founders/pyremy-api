@@ -50,6 +50,7 @@ export class PortfolioDto extends CommonDto<PortfolioDto> {
                 const date = dates[indx];
 
                 return {
+                    t: +date,
                     d: moment(+date).format('DD MMM, YYYY'),
                     v: v,
                     w: coinKeys.map((coinKey) => _.get(this.weights, `${coinKey}.${date}`)),

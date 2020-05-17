@@ -31,7 +31,6 @@ export class PyremyService {
         }
     }
 
-
     public async portfolio(
         currencies: string[],
         risk: number = 5,

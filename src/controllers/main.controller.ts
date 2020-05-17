@@ -1,7 +1,7 @@
 import { Controller, Get, Inject, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import _ from 'lodash';
-import { OptMethods, PyremyService } from 'src/optimisation';
+import { KunaService, OptimisationService, OptMethods, PyremyService } from 'src/optimisation';
 
 /**
  * Class MainController
@@ -11,6 +11,8 @@ import { OptMethods, PyremyService } from 'src/optimisation';
 export class MainController {
     public constructor(
         @Inject(PyremyService) private readonly pyremyService: PyremyService,
+        @Inject(KunaService) private readonly kunaService: KunaService,
+        @Inject(OptimisationService) private readonly optimisationService: OptimisationService,
     ) {
     }
 
@@ -47,6 +49,8 @@ export class MainController {
             risk = 5;
         }
 
+        const weekCount = +_.get(query, 'weeks', 4);
+
         let method = _.get(query, 'method', OptMethods.Markowitz);
         if (![OptMethods.Markowitz, OptMethods.Weighted].includes(method)) {
             method = OptMethods.Markowitz;
@@ -54,10 +58,18 @@ export class MainController {
 
         try {
             const data = await this.pyremyService.portfolio(currencies, risk, method);
+            const charts = await this.kunaService.fetchList(currencies, (weekCount + 1) * 7);
+
+            const model = this.optimisationService.check(
+                40000,
+                currencies,
+                data,
+                charts,
+                weekCount,
+            );
 
             res.status(200).send({
-                values: data.currentWeights,
-                lasts: data.getReturnsBy(4, 0.02),
+                model: model,
                 params: { currencies, risk, method },
                 // return: data.getDateList(),
             });
