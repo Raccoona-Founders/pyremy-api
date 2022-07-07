@@ -37,7 +37,7 @@
         "keycloak-js": "9.0.3",
         "kuna-sdk": "^0.4.20",
         "lodash": "4.17.15",
-        "moment": "^2.25.3",
+        "moment": "^2.29.4",
         "mongoose": "5.9.10",
         "nestjs-redis": "^1.2.7",
         "nestjs-typegoose": "7.1.22",
